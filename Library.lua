@@ -2697,3 +2697,5 @@ function Menu:Init()
         Menu.ScreenSize = Menu.Screen.AbsoluteSize
     end)
 end
+
+return Menu
