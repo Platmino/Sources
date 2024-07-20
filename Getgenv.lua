@@ -1,38 +1,7 @@
-local Library = {};
-local Font_Old = Enum.Font.GothamBold
-local Path = game:GetService("RunService"):IsStudio() and game.Players.LocalPlayer.PlayerGui or game.CoreGui
-local Tick = tick() 
-
-repeat wait() until game:IsLoaded(); 
-
-local Tick = tick()
-
--- Custom Fonts
-do 
-	-- 
-	writefile("smallest_pixel.ttf", game:HttpGet("https://github.com/f1nobe7650/other/raw/main/ProggyTiny.ttf"))
-	-- 
-	local smallest_pixel = {
-		name = "SmallestPixel7",
-		faces = {
-			{
-				name = "Regular",
-				weight = 400,
-				style = "normal",
-				assetId = getcustomasset("smallest_pixel.ttf")
-			}
-		}
-	}
-
-	writefile("menu_font.font", game:GetService("HttpService"):JSONEncode(smallest_pixel))
-
-	getgenv().menu_font = Font.new(getcustomasset("menu_font.font"), Enum.FontWeight.Regular)
-end; 
-
 do -- Library
 	Library = {
 		Open = true;
-		Accent = Color3.fromRGB(132, 108, 188);
+		Accent = Color3.fromRGB(255, 128, 139); --Color3.fromRGB(0,117,19);
 		Pages = {};
 		Sections = {};
 		Flags = {};
@@ -89,7 +58,7 @@ do -- Library
 			[Enum.UserInputType.MouseButton3] = "MB3"
 		};
 		Connections = {};
-		UIKey = Enum.KeyCode.End;
+		UIKey = Enum.KeyCode.RightShift;
 		ScreenGUI = nil;
 		FSize = 10;
 		UIFont = nil;
@@ -137,9 +106,11 @@ do -- Library
 			local Config = ""
 			for Index, Value in pairs(self.Flags) do
 				if
-					Index ~= "ConfigConfig_List"
-					and Index ~= "ConfigConfig_Load"
-					and Index ~= "ConfigConfig_Save"
+					Index ~= "Config_List"
+					and Index ~= "Config_Name"
+					and Index ~= "MenuKey"
+					and Index ~= "CloudConfigName"
+					and Index ~= "CloudConfigDesc"
 				then
 					local Value2 = Value
 					local Final = ""
@@ -267,7 +238,7 @@ do -- Library
 					theme.BackgroundColor3 = Color
 				elseif theme:IsA("TextLabel") or theme:IsA("TextBox") then
 					theme.TextColor3 = Color
-				elseif theme:IsA("ImageLabel") or theme:IsA("ImageButton") then
+				elseif theme:IsA("ImageLabel") or theme:IsA("ImageButton") and theme.Name ~= "Logo" then
 					theme.ImageColor3 = Color
 				elseif theme:IsA("ScrollingFrame") then
 					theme.ScrollBarImageColor3 = Library.Accent
@@ -307,6 +278,7 @@ do -- Library
 				Icon.Position = UDim2.new(1, - (count * 34) - (count * 4),0.5,0)
 			end
 			Icon.Size = UDim2.new(0, 34, 0, 10)
+			Icon.ZIndex = 50
 			Icon.Text = ""
 			Icon.AutoButtonColor = false
 
@@ -331,7 +303,7 @@ do -- Library
 			ColorWindow.Position = UDim2.new(1,-2,1,2)
 			ColorWindow.Size = UDim2.new(0,150,0,146)
 			ColorWindow.AnchorPoint = Vector2.new(1,0)
-			ColorWindow.ZIndex = 100
+			ColorWindow.ZIndex = 200
 			ColorWindow.Visible = false
 			ColorWindow.BorderSizePixel = 1
 			ColorWindow.BackgroundColor3 = Color3.fromRGB(20,20,20)
@@ -575,14 +547,13 @@ do -- Library
 				if ColorWindow.Visible and Input.UserInputType == Enum.UserInputType.MouseButton1 then
 					if not Library:IsMouseOverFrame(ColorWindow) and not Library:IsMouseOverFrame(Icon) then
 						ColorWindow.Visible = false
-						parent.ZIndex = 1
 					end
 				end
 			end)
 
 			Icon.MouseButton1Down:Connect(function()
 				ColorWindow.Visible = true
-				parent.ZIndex = 5
+				parent.ZIndex = 200
 
 				if slidinghue then
 					slidinghue = false
@@ -630,11 +601,12 @@ do -- Library
 			dragging = true
 			start = input
 		end)
+
 		Library:Connection(Mouse.Move, function(input)
 			if dragging then
 				local MouseLocation = game:GetService("UserInputService"):GetMouseLocation()
-				local X = math.clamp(MouseLocation.X - background.AbsolutePosition.X, 550, 9999)
-				local Y = math.clamp((MouseLocation.Y - 36) - background.AbsolutePosition.Y, 600, 9999)
+				local X = math.clamp(MouseLocation.X - background.AbsolutePosition.X, 600, 9999)
+				local Y = math.clamp((MouseLocation.Y - 36) - background.AbsolutePosition.Y, 700, 9999)
 				currentsize = UDim2.new(0,X,0,Y)
 				background.Size = currentsize
 			end;
@@ -658,10 +630,10 @@ do -- Library
 				Dragging = { false, UDim2.new(0, 0, 0, 0) };
 			};
 			
-			local FentFun = Instance.new("ScreenGui", Path)
-			FentFun.Name = "fent.fun"
-			FentFun.DisplayOrder = 1000
-			FentFun.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			local ObeseVip = Instance.new("ScreenGui", Path)
+			ObeseVip.Name = "Obese.vip"
+			ObeseVip.DisplayOrder = 5
+			ObeseVip.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 			local ImageLabel = Instance.new("ImageLabel")
 			ImageLabel.Name = "ImageLabel"
@@ -672,7 +644,7 @@ do -- Library
 			ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			ImageLabel.BorderSizePixel = 0
 			ImageLabel.Position = UDim2.new(0.1, 0, 0.1, 0)
-			ImageLabel.Size = UDim2.new(0, 700, 0, 550)
+			ImageLabel.Size = UDim2.new(0, 800, 0, 700)
 
 			local MainFrame = Instance.new("TextButton")
 			MainFrame.Name = "MainFrame"
@@ -695,17 +667,36 @@ do -- Library
 
 			local Logo = Library:NewInstance("ImageLabel", true)
 			Logo.Name = "Logo"
-			Logo.Image = "http://www.roblox.com/asset/?id=17655988165"
+			Logo.Image = getCustomImage(OBImg,"Icon")
 			Logo.ScaleType = Enum.ScaleType.Fit
 			Logo.AnchorPoint = Vector2.new(0, 0.5)
 			Logo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Logo.BackgroundTransparency = 1
-			Logo.ImageColor3 = Library.Accent
+			Logo.ImageColor3 = Color3.new(1,1,1)--Library.Accent
 			Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Logo.BorderSizePixel = 0
-			Logo.Position = UDim2.new(0, 5, 0.5, 0)
+			Logo.Position = UDim2.new(0, 5, 0.5, -1)
 			Logo.Size = UDim2.new(0, 20, 0, 20)
 			Logo.Parent = TopFrame
+
+			local ScriptTitle = Library:NewInstance("TextLabel", false)
+
+			ScriptTitle.Name = "ScriptTitle"
+			ScriptTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			ScriptTitle.BackgroundTransparency = 1.000
+			ScriptTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ScriptTitle.BorderSizePixel = 0
+			ScriptTitle.Size = UDim2.new(0, 20, 0, 20)
+			ScriptTitle.FontFace = menu_font
+			ScriptTitle.Text = "Obese.vip | "..OBESEVERSION
+			ScriptTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ScriptTitle.TextSize = 12.000
+			ScriptTitle.RichText = true
+			ScriptTitle.AnchorPoint = Vector2.new(0, 0.5)
+			ScriptTitle.Position = UDim2.new(0, 30, 0.5, 0)
+			ScriptTitle.Parent = TopFrame
+			ScriptTitle.TextXAlignment = Enum.TextXAlignment.Left
+
 
 			TopFrame.Parent = MainFrame
 
@@ -717,9 +708,10 @@ do -- Library
 			Tabs.BorderSizePixel = 0
 			Tabs.BorderColor3 = Color3.new(0,0,0)
 			Tabs.ScrollBarThickness = 2 
+            Tabs.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			Tabs.ScrollBarImageColor3 = Library.Accent
 			Tabs.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left
-			Tabs.CanvasSize = UDim2.new(0, 0, 1.15, 0)
+			Tabs.CanvasSize = UDim2.new(0, 0, 0, 0)
 			Tabs.Position = UDim2.new(0, 0, 0, 25)
 			table.insert(Library.ThemeObjects, Tabs)
 
@@ -799,7 +791,7 @@ do -- Library
 
 			Holder.Parent = ImageLabel
 
-			ImageLabel.Parent = FentFun
+			ImageLabel.Parent = ObeseVip
 
 			Window.Elements = {
 				TabHolder = Tabs,
@@ -859,7 +851,7 @@ do -- Library
 				Background.Size = UDim2.new(0, 180, 0, 24)
 				Background.Visible = false
 				Background.AutomaticSize = Enum.AutomaticSize.XY
-				Background.Parent = FentFun
+				Background.Parent = ObeseVip
 
 				Gradient.Name = "Gradient"
 				Gradient.Parent = Background
@@ -998,7 +990,7 @@ do -- Library
 			
 			local Page = {
 				Name = Properties.Name or Properties.name or "Page",
-				Icon = Properties.Icon or "rbxassetid://17023142662",
+				Icon = Properties.Icon or "rbxassetid://16714702100",
 				Window = self,
 				Open = false,
 				Sections = {},
@@ -1582,8 +1574,9 @@ do -- Library
 				ModeBox.BackgroundColor3 = Color3.fromRGB(20,20,20)
 				ModeBox.BorderColor3 = Color3.fromRGB(30,30,30)
 				ModeBox.BorderSizePixel = 1
+				ModeBox.ZIndex = 99
 				ModeBox.Size = UDim2.new(0, 65, 0, 60)
-				ModeBox.Position = UDim2.new(0,40,0.5,0)
+				ModeBox.Position = UDim2.new(0,-40,0.5,0)
 				ModeBox.Visible = false
 
 				Hold.Name = "Hold"
@@ -1723,11 +1716,9 @@ do -- Library
 							if Keybind.Flag then
 								Library.Flags[Keybind.Flag] = true
 							end
-							c = Library:Connection(game:GetService("RunService").RenderStepped, function()
-								if Keybind.Callback then
-									Keybind.Callback(true)
-								end
-							end)
+							if Keybind.Callback then
+								Keybind.Callback(true)
+							end
 							ListValue:SetVisible(true)
 						elseif Keybind.Mode == "Toggle" then
 							State = not State
@@ -1744,16 +1735,13 @@ do -- Library
 					if Keybind.Mode == "Hold" and not Keybind.UseKey then
 						if Key ~= "" or Key ~= nil then
 							if inp.KeyCode == Key or inp.UserInputType == Key then
-								if c then
-									c:Disconnect()
-									if Keybind.Flag then
-										Library.Flags[Keybind.Flag] = false
-									end
-									if Keybind.Callback then
-										Keybind.Callback(false)
-									end
-									ListValue:SetVisible(false)
+								if Keybind.Flag then
+									Library.Flags[Keybind.Flag] = false
 								end
+								if Keybind.Callback then
+									Keybind.Callback(false)
+								end
+								ListValue:SetVisible(false)
 							end
 						end
 					end
@@ -2160,6 +2148,7 @@ do -- Library
 			NewList.BorderSizePixel = 0
 			NewList.Size = UDim2.new(1, 0, 0, 34)
 			NewList.Parent = Dropdown.Section.Elements.SectionContent
+			NewList.ZIndex = 40
 
 			function Dropdown:SetVisible(Bool) 
 				NewList.Visible = Bool
@@ -2241,7 +2230,7 @@ do -- Library
 			Content.Position = UDim2.new(0, 0, 1, 0)
 			Content.Size = UDim2.new(1, 0, 0, 0)
 			Content.Visible = false
-			Content.ZIndex = 50
+			Content.ZIndex = 200
 
 			local UIListLayout = Instance.new("UIListLayout")
 			UIListLayout.Name = "UIListLayout"
@@ -2270,11 +2259,11 @@ do -- Library
 			
 			Library:Connection(Frame.MouseButton1Down, function()
 				Content.Visible = not Content.Visible
-				if Content.Visible then
-					NewList.ZIndex = 5
+				--[[if Content.Visible then
+					NewList.ZIndex = 200
 				else
 					NewList.ZIndex = 1
-				end
+				end]]
 			end)
 			Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
 				if Content.Visible and Input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -2475,7 +2464,9 @@ do -- Library
 			function Dropdown:Refresh(tbl)
 				for _, opt in next, Dropdown.OptionInsts do
 					coroutine.wrap(function()
-						opt.button:Destroy()
+						task.spawn(function()
+							opt.button:Destroy()
+						end)
 					end)()
 				end
 				table.clear(Dropdown.OptionInsts)
@@ -2771,7 +2762,7 @@ do -- Library
 			ModeBox.BorderColor3 = Color3.fromRGB(30,30,30)
 			ModeBox.BorderSizePixel = 1
 			ModeBox.Size = UDim2.new(0, 65, 0, 60)
-			ModeBox.Position = UDim2.new(0,40,0.5,0)
+			ModeBox.Position = UDim2.new(0,-40,0.5,0)
 			ModeBox.Visible = false
 
 			Hold.Name = "Hold"
@@ -3300,7 +3291,7 @@ do -- Library
 
 			local UIListLayout = Instance.new("UIListLayout")
 			UIListLayout.Name = "UIListLayout"
-			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			UIListLayout.SortOrder = Enum.SortOrder.Name
 			UIListLayout.Parent = List
 
 			List.Parent = NewPlayer
@@ -3424,6 +3415,13 @@ do -- Library
 			
 			local chosen = nil
 			local optioninstances = {}
+            
+            local function containsBrackets(text)
+                local leftBracketFound = text:match("%[")
+                local rightBracketFound = text:match("%]")
+                return leftBracketFound ~= nil and rightBracketFound ~= nil
+            end
+
 			local function handleoptionclick(option, button, accent)
 				button.MouseButton1Click:Connect(function()
 					chosen = option
@@ -3439,7 +3437,12 @@ do -- Library
 					
 					if Playerlist.CurrentPlayer ~= Playerlist.LastPlayer then
 						Playerlist.LastPlayer = Playerlist.CurrentPlayer;
-						PlayerName1.Text = ("Id : %s\nDisplay Name : %s\nName : %s\nAccount Age : %s"):format(Playerlist.CurrentPlayer.UserId, Playerlist.CurrentPlayer.DisplayName ~= "" and Playerlist.CurrentPlayer.DisplayName or Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.AccountAge)
+                        local hasemoji = containsBrackets(Playerlist.CurrentPlayer.Character.Humanoid.DisplayName)
+						local currentcash = -1
+						if Playerlist.CurrentPlayer:FindFirstChild("DataFolder") and Playerlist.CurrentPlayer.DataFolder:FindFirstChild("Currency") then 
+							currentcash = Playerlist.CurrentPlayer.DataFolder:FindFirstChild("Currency").Value
+						end
+						PlayerName1.Text = ("Id : %s\nDisplay Name : %s\nName : %s\nAccount Age : %s\nHas Emoji : %s\nCash : $%s"):format(Playerlist.CurrentPlayer.UserId, Playerlist.CurrentPlayer.DisplayName ~= "" and Playerlist.CurrentPlayer.DisplayName or Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.AccountAge,tostring(hasemoji),formatCash(currentcash))
 						
 						local imagedata = game:GetService("Players"):GetUserThumbnailAsync(Playerlist.CurrentPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
@@ -3466,7 +3469,7 @@ do -- Library
 					local PlayerName = Instance.new("TextLabel")
 					PlayerName.Name = "PlayerName"
 					PlayerName.FontFace = menu_font
-					PlayerName.Text = option.Name
+					PlayerName.Text = option.DisplayName.." (@"..option.Name..")"
 					PlayerName.TextColor3 = Color3.fromRGB(200, 200, 200)
 					PlayerName.TextSize = Library.FSize
 					PlayerName.TextStrokeTransparency = 0
@@ -3622,6 +3625,11 @@ do -- Library
 			Value.BorderSizePixel = 0
 			Value.Size = UDim2.new(1, 0, 1, 0)
 			Value.Parent = NewButton
+
+
+			function Label:SetText(t)
+				Value.Text = t
+			end
 
 			return Label
 		end
