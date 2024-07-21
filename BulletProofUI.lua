@@ -2406,7 +2406,7 @@ do
 					coroutine.wrap(function()
 						pcall(function()
 							opt.button:Destroy()
-						end
+						end)
 					end)()
 				end
 				table.clear(List.OptionInsts)
