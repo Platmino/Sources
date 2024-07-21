@@ -5,7 +5,7 @@ local Library = {};
 do
 	Library = {
 		Open = true;
-		Accent = Color3.fromRGB(186, 181, 255);
+		Accent = Color3.fromRGB(255, 128, 139);
 		PageAmount = 0;
 		Pages = {};
 		Sections = {};
@@ -255,31 +255,6 @@ do
 			end
 		end
 		--
-		function Library:Resize(object, background)
-			local start, objectposition, dragging, currentpos, currentsize
-
-			Library:Connection(object.MouseButton1Down, function(input)
-				dragging = true
-				start = input
-			end)
-			Library:Connection(Mouse.Move, function(input)
-				if dragging then
-					local MouseLocation = game:GetService("UserInputService"):GetMouseLocation()
-					local X = math.clamp(MouseLocation.X - background.AbsolutePosition.X, 550, 9999)
-					local Y = math.clamp((MouseLocation.Y - 36) - background.AbsolutePosition.Y, 600, 9999)
-					currentsize = UDim2.new(0,X,0,Y)
-					background.Size = currentsize
-					for Index, Page in pairs(Library.Pages) do
-						Page.Elements.Button.Size = UDim2.new(0, Library.PageAmount and ((((background.Size.X.Offset - 35) - ((Library.PageAmount - 1) * 2)) / Library.PageAmount)) - 3 or 65, 1, 0);
-					end
-				end;
-			end)
-			Library:Connection(game:GetService("UserInputService").InputEnded, function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 then
-					dragging = false
-				end
-			end)
-		end
 	end;
 
 	-- // Colorpicker Element
@@ -727,7 +702,7 @@ do
 			AccentOutline.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			AccentOutline.ClipsDescendants = false
 			AccentOutline.Position = UDim2.new(0, 200, 0, 200)
-			AccentOutline.Size = UDim2.new(0, 550, 0, 725) -- was UDim2.new(0, 550, 0, 600)
+			AccentOutline.Size = UDim2.new(0, 550, 0, 450) -- was UDim2.new(0, 550, 0, 600)
 			AccentOutline.ZIndex = 2
 			AccentOutline.Text = ""
 			AccentOutline.AutoButtonColor = false
@@ -815,22 +790,6 @@ do
 			Title.Size = UDim2.new(0, 200, 0, 20)
 			Title.Parent = Inline
 			
-			local Resize = Instance.new("TextButton")
-			Resize.Name = "Resize"
-			Resize.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
-			Resize.Text = ""
-			Resize.TextColor3 = Color3.fromRGB(0, 0, 0)
-			Resize.TextSize = 14
-			Resize.AutoButtonColor = false
-			Resize.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Resize.BackgroundTransparency = 1
-			Resize.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Resize.BorderSizePixel = 0
-			Resize.Position = UDim2.new(1, -15, 1, -15)
-			Resize.Size = UDim2.new(0, 20, 0, 20)
-			Resize.Parent = Inline
-			Resize.ZIndex = 100
-			
 			local ImageLabel = Instance.new("ImageLabel")
 			ImageLabel.Name = "ImageLabel"
 			ImageLabel.Image = "rbxassetid://9052792535"
@@ -887,7 +846,6 @@ do
 					Library:SetOpen(not Library.Open)
 				end
 			end)
-			Library:Resize(Resize, AccentOutline)
 
 			-- // Functions
 			function Window:UpdateTabs()
@@ -2103,375 +2061,378 @@ do
 			return Slider
 		end
 		--
-		function Sections:List(Properties)
-			local Properties = Properties or {};
-			local List = {
-				Window = self.Window,
-				Page = self.Page,
-				Section = self,
-				Open = false,
-				Name = Properties.Name or Properties.name or nil,
-				Options = (Properties.options or Properties.Options or Properties.values or Properties.Values or {
-					"1",
-					"2",
-					"3",
-				}),
-				Max = (Properties.Max or Properties.max or nil),
-				ScrollMax = (Properties.ScrollingMax or Properties.scrollingmax or nil),
-				State = (
-					Properties.state
-						or Properties.State
-						or Properties.def
-						or Properties.Def
-						or Properties.default
-						or Properties.Default
-						or nil
-				),
-				Callback = (
-					Properties.callback
-						or Properties.Callback
-						or Properties.callBack
-						or Properties.CallBack
-						or function() end
-				),
-				Flag = (
-					Properties.flag
-						or Properties.Flag
-						or Properties.pointer
-						or Properties.Pointer
-						or Library.NextFlag()
-				),
-				OptionInsts = {},
-			}
-			--
-			local NewList = Instance.new("Frame")
-			NewList.Name = "NewList"
-			NewList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			NewList.BackgroundTransparency = 1
-			NewList.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			NewList.BorderSizePixel = 0
-			NewList.Size = UDim2.new(1, 0, 0, List.Name ~= nil and 30 or 16)
-			NewList.Parent = List.Section.Elements.SectionContent
-
-			local Outline = Instance.new("Frame")
-			Outline.Name = "Outline"
-			Outline.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-			Outline.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Outline.Position = UDim2.new(0, 0, 1, -16)
-			Outline.Size = UDim2.new(1, 0, 0, 16)
-
-			local Inline = Instance.new("TextButton")
-			Inline.Name = "Inline"
-			Inline.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-			Inline.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Inline.BorderSizePixel = 0
-			Inline.Position = UDim2.new(0, 1, 0, 1)
-			Inline.Size = UDim2.new(1, -2, 1, -2)
-			Inline.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
-			Inline.Text = ""
-			Inline.TextColor3 = Color3.fromRGB(0, 0, 0)
-			Inline.TextSize = 14
-			Inline.AutoButtonColor = false
-
-			local Value = Instance.new("TextLabel")
-			Value.Name = "Value"
-			Value.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
-			Value.Text = "None"
-			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
-			Value.TextSize = 12
-			Value.TextStrokeTransparency = 0
-			Value.TextXAlignment = Enum.TextXAlignment.Left
-			Value.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Value.BackgroundTransparency = 1
-			Value.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Value.BorderSizePixel = 0
-			Value.Position = UDim2.new(0, 4, 0, 0)
-			Value.Size = UDim2.new(1, 0, 1, 0)
-			Value.Parent = Inline
-
-			local Icon = Instance.new("TextLabel")
-			Icon.Name = "Icon"
-			Icon.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
-			Icon.Text = "+"
-			Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-			Icon.TextSize = 12
-			Icon.TextStrokeTransparency = 0
-			Icon.TextXAlignment = Enum.TextXAlignment.Right
-			Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Icon.BackgroundTransparency = 1
-			Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Icon.BorderSizePixel = 0
-			Icon.Position = UDim2.new(0, -4, 0, 0)
-			Icon.Size = UDim2.new(1, 0, 1, 0)
-			Icon.Parent = Inline
-
-			Inline.Parent = Outline
-
-			local ContentOutline = Instance.new("Frame")
-			ContentOutline.Name = "ContentOutline"
-			ContentOutline.AutomaticSize = Enum.AutomaticSize.Y
-			ContentOutline.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-			ContentOutline.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			ContentOutline.Position = UDim2.new(0, 0, 1, 1)
-			ContentOutline.Size = UDim2.new(1, 0, 0, 0)
-			ContentOutline.Visible = false
-
-			local ContentInline = Instance.new("Frame")
-			ContentInline.Name = "ContentInline"
-			ContentInline.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-			ContentInline.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			ContentInline.BorderSizePixel = 0
-			ContentInline.Position = UDim2.new(0, 1, 0, 1)
-			ContentInline.Size = UDim2.new(1, -2, 1, -2)
-
-			local UIListLayout = Instance.new("UIListLayout")
-			UIListLayout.Name = "UIListLayout"
-			UIListLayout.Padding = UDim.new(0, 2)
-			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			UIListLayout.Parent = ContentInline
-
-			local UIPadding = Instance.new("UIPadding")
-			UIPadding.Name = "UIPadding"
-			UIPadding.PaddingBottom = UDim.new(0, 2)
-			UIPadding.PaddingTop = UDim.new(0, 2)
-			UIPadding.Parent = ContentInline
-
-			ContentInline.Parent = ContentOutline
-
-			ContentOutline.Parent = Outline
-
-			Outline.Parent = NewList
-
-			local Title = Instance.new("TextLabel")
-			Title.Name = "Title"
-			Title.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
-			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-			Title.TextSize = 12
-			Title.TextStrokeTransparency = 0
-			Title.TextXAlignment = Enum.TextXAlignment.Left
-			Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Title.BackgroundTransparency = 1
-			Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Title.BorderSizePixel = 0
-			Title.Size = UDim2.new(1, 0, 0, 10)
-			Title.Parent = NewList
-			Title.Visible = List.Name ~= nil and true or false
-			Title.Text = List.Name ~= nil and List.Name or ""
-
-			-- // Connections
-			Library:Connection(Inline.MouseButton1Down, function()
-				ContentOutline.Visible = not ContentOutline.Visible
-				if ContentOutline.Visible then
-					Icon.Text = "-"
-					NewList.ZIndex = 5
-				else
-					Icon.Text = "+"
-					NewList.ZIndex = 1
-				end
-			end)
-			Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
-				if ContentOutline.Visible and Input.UserInputType == Enum.UserInputType.MouseButton1 then
-					if not Library:IsMouseOverFrame(ContentOutline) and not Library:IsMouseOverFrame(Inline) then
-						ContentOutline.Visible = false
-						NewList.ZIndex = 1
-						Icon.Text = "+"
-					end
-				end
-			end)
-			--
-			local chosen = List.Max and {} or nil
-			local Count = 0
-			--
-			local function handleoptionclick(option, button, text)
-				button.MouseButton1Down:Connect(function()
-					if List.Max then
-						if table.find(chosen, option) then
-							table.remove(chosen, table.find(chosen, option))
-
-							local textchosen = {}
-							local cutobject = false
-
-							for _, opt in next, chosen do
-								table.insert(textchosen, opt)
-							end
-
-							Value.Text = #chosen == 0 and "" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
-							text.TextColor3 = Color3.fromRGB(145,145,145)
-							
-							Library.Flags[List.Flag] = chosen
-							List.Callback(chosen)
-						else
-							if #chosen == List.Max then
-								List.OptionInsts[chosen[1]].accent.Visible = false
-								table.remove(chosen, 1)
-							end
-
-							table.insert(chosen, option)
-
-							local textchosen = {}
-							local cutobject = false
-
-							for _, opt in next, chosen do
-								table.insert(textchosen, opt)
-							end
-
-							Value.Text = #chosen == 0 and "" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
-							text.TextColor3 = Color3.fromRGB(255,255,255)
-
-							Library.Flags[List.Flag] = chosen
-							List.Callback(chosen)
-						end
-					else
-						for opt, tbl in next, List.OptionInsts do
-							if opt ~= option then
-								tbl.text.TextColor3 = Color3.fromRGB(145,145,145)
-							end
-						end
-						chosen = option
-						Value.Text = option
-						text.TextColor3 = Color3.fromRGB(255,255,255)
-						ContentOutline.Visible = false
-						NewList.ZIndex = 1
-						Icon.Text = "+"
-						Library.Flags[List.Flag] = option
-						List.Callback(option)
-					end
-				end)
-			end
-			--
-			local function createoptions(tbl)
-				for _, option in next, tbl do
-					List.OptionInsts[option] = {}
-					--
-					local NewOption = Instance.new("TextButton")
-					NewOption.Name = "NewOption"
-					NewOption.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
-					NewOption.Text = ""
-					NewOption.TextColor3 = Color3.fromRGB(255, 255, 255)
-					NewOption.TextSize = 12
-					NewOption.TextStrokeTransparency = 0
-					NewOption.TextWrapped = true
-					NewOption.TextXAlignment = Enum.TextXAlignment.Left
-					NewOption.AutoButtonColor = false
-					NewOption.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-					NewOption.BackgroundTransparency = 1
-					NewOption.BorderColor3 = Color3.fromRGB(0, 0, 0)
-					NewOption.BorderSizePixel = 0
-					NewOption.Size = UDim2.new(1, 0, 0, 14)
-
-					local OptionLabel = Instance.new("TextLabel")
-					OptionLabel.Name = "OptionLabel"
-					OptionLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
-					OptionLabel.Text = option
-					OptionLabel.TextColor3 = Color3.fromRGB(145, 145, 145)
-					OptionLabel.TextSize = 12
-					OptionLabel.TextStrokeTransparency = 0
-					OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
-					OptionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-					OptionLabel.BackgroundTransparency = 1
-					OptionLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-					OptionLabel.BorderSizePixel = 0
-					OptionLabel.Position = UDim2.new(0, 4, 0, 0)
-					OptionLabel.Size = UDim2.new(1, 0, 1, 0)
-					OptionLabel.Parent = NewOption
-
-					NewOption.Parent = ContentInline
-
-					List.OptionInsts[option].text = OptionLabel
-
-					Count = Count + 1
-
-					handleoptionclick(option, NewOption, OptionLabel)
-				end
-			end
-			createoptions(List.Options)
-			--
-			local set
-			set = function(option)
-				if List.Max then
-					table.clear(chosen)
-					option = type(option) == "table" and option or {}
-
-					for opt, tbl in next, List.OptionInsts do
-						if not table.find(option, opt) then
-							tbl.text.TextColor3 = Color3.fromRGB(145,145,145)
-						end
-					end
-
-					for i, opt in next, option do
-						if table.find(List.Options, opt) and #chosen < List.Max then
-							table.insert(chosen, opt)
-							List.OptionInsts[opt].text.TextColor3 = Color3.fromRGB(255,255,255)
-						end
-					end
-
-					local textchosen = {}
-					local cutobject = false
-
-					for _, opt in next, chosen do
-						table.insert(textchosen, opt)
-					end
-
-					Value.Text = #chosen == 0 and "" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
-
-					Library.Flags[List.Flag] = chosen
-					List.Callback(chosen)
-				end
-			end
-			--
-			function List:Set(option)
-				if List.Max then
-					set(option)
-				else
-					for opt, tbl in next, List.OptionInsts do
-						if opt ~= option then
-							tbl.text.TextColor3 = Color3.fromRGB(145,145,145)
-						end
-					end
-					if table.find(List.Options, option) then
-						chosen = option
-						List.OptionInsts[option].text.TextColor3 = Color3.fromRGB(255,255,255)
-						Value.Text = option
-						Library.Flags[List.Flag] = chosen
-						List.Callback(chosen)
-					else
-						chosen = nil
-						Value.Text = "None"
-						Library.Flags[List.Flag] = chosen
-						List.Callback(chosen)
-					end
-				end
-			end
-			--
-			function List:Refresh(tbl)
-				for _, opt in next, List.OptionInsts do
-					coroutine.wrap(function()
-						opt.button:Destroy()
-					end)()
-				end
-				table.clear(List.OptionInsts)
-
-				createoptions(tbl)
-
-				if List.Max then
-					table.clear(chosen)
-				else
-					chosen = nil
-				end
-
-				Library.Flags[List.Flag] = chosen
-				List.Callback(chosen)
-			end
-
-			-- // Returning
-			if List.Max then
-				Flags[List.Flag] = set
-			else
-				Flags[List.Flag] = List
-			end
-			List:Set(List.State)
-			return List
-		end
+        function Sections:List(Properties)
+            local Properties = Properties or {}
+            local List = {
+                Window = self.Window,
+                Page = self.Page,
+                Section = self,
+                Open = false,
+                Name = Properties.Name or Properties.name or nil,
+                Options = (Properties.options or Properties.Options or Properties.values or Properties.Values or {
+                    "1",
+                    "2",
+                    "3",
+                }),
+                Max = (Properties.Max or Properties.max or nil),
+                ScrollMax = (Properties.ScrollingMax or Properties.scrollingmax or nil),
+                State = (
+                    Properties.state
+                    or Properties.State
+                    or Properties.def
+                    or Properties.Def
+                    or Properties.default
+                    or Properties.Default
+                    or nil
+                ),
+                Callback = (
+                    Properties.callback
+                    or Properties.Callback
+                    or Properties.callBack
+                    or Properties.CallBack
+                    or function() end
+                ),
+                Flag = (
+                    Properties.flag
+                    or Properties.Flag
+                    or Properties.pointer
+                    or Properties.Pointer
+                    or Library.NextFlag()
+                ),
+                OptionInsts = {},
+            }
+            --
+            local NewList = Instance.new("Frame")
+            NewList.Name = "NewList"
+            NewList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            NewList.BackgroundTransparency = 1
+            NewList.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            NewList.BorderSizePixel = 0
+            NewList.Size = UDim2.new(1, 0, 0, List.Name ~= nil and 30 or 16)
+            NewList.Parent = List.Section.Elements.SectionContent
+        
+            local Outline = Instance.new("Frame")
+            Outline.Name = "Outline"
+            Outline.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Outline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            Outline.Position = UDim2.new(0, 0, 1, -16)
+            Outline.Size = UDim2.new(1, 0, 0, 16)
+        
+            local Inline = Instance.new("TextButton")
+            Inline.Name = "Inline"
+            Inline.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            Inline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            Inline.BorderSizePixel = 0
+            Inline.Position = UDim2.new(0, 1, 0, 1)
+            Inline.Size = UDim2.new(1, -2, 1, -2)
+            Inline.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
+            Inline.Text = ""
+            Inline.TextColor3 = Color3.fromRGB(0, 0, 0)
+            Inline.TextSize = 14
+            Inline.AutoButtonColor = false
+        
+            local Value = Instance.new("TextLabel")
+            Value.Name = "Value"
+            Value.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+            Value.Text = "None"
+            Value.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Value.TextSize = 12
+            Value.TextStrokeTransparency = 0
+            Value.TextXAlignment = Enum.TextXAlignment.Left
+            Value.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Value.BackgroundTransparency = 1
+            Value.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            Value.BorderSizePixel = 0
+            Value.Position = UDim2.new(0, 4, 0, 0)
+            Value.Size = UDim2.new(1, 0, 1, 0)
+            Value.Parent = Inline
+        
+            local Icon = Instance.new("TextLabel")
+            Icon.Name = "Icon"
+            Icon.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+            Icon.Text = "+"
+            Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Icon.TextSize = 12
+            Icon.TextStrokeTransparency = 0
+            Icon.TextXAlignment = Enum.TextXAlignment.Right
+            Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Icon.BackgroundTransparency = 1
+            Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            Icon.BorderSizePixel = 0
+            Icon.Position = UDim2.new(0, -4, 0, 0)
+            Icon.Size = UDim2.new(1, 0, 1, 0)
+            Icon.Parent = Inline
+        
+            Inline.Parent = Outline
+        
+            local ContentOutline = Instance.new("Frame")
+            ContentOutline.Name = "ContentOutline"
+            ContentOutline.AutomaticSize = Enum.AutomaticSize.Y
+            ContentOutline.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            ContentOutline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            ContentOutline.Position = UDim2.new(0, 0, 1, 1)
+            ContentOutline.Size = UDim2.new(1, 0, 0, 0)
+            ContentOutline.Visible = false
+        
+            local ContentInline = Instance.new("Frame")
+            ContentInline.Name = "ContentInline"
+            ContentInline.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            ContentInline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            ContentInline.BorderSizePixel = 0
+            ContentInline.Position = UDim2.new(0, 1, 0, 1)
+            ContentInline.Size = UDim2.new(1, -2, 1, -2)
+        
+            local UIListLayout = Instance.new("UIListLayout")
+            UIListLayout.Name = "UIListLayout"
+            UIListLayout.Padding = UDim.new(0, 2)
+            UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            UIListLayout.Parent = ContentInline
+        
+            local UIPadding = Instance.new("UIPadding")
+            UIPadding.Name = "UIPadding"
+            UIPadding.PaddingBottom = UDim.new(0, 2)
+            UIPadding.PaddingTop = UDim.new(0, 2)
+            UIPadding.Parent = ContentInline
+        
+            ContentInline.Parent = ContentOutline
+        
+            ContentOutline.Parent = Outline
+        
+            Outline.Parent = NewList
+        
+            local Title = Instance.new("TextLabel")
+            Title.Name = "Title"
+            Title.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextSize = 12
+            Title.TextStrokeTransparency = 0
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundTransparency = 1
+            Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            Title.BorderSizePixel = 0
+            Title.Size = UDim2.new(1, 0, 0, 10)
+            Title.Parent = NewList
+            Title.Visible = List.Name ~= nil and true or false
+            Title.Text = List.Name ~= nil and List.Name or ""
+        
+            -- // Connections
+            Library:Connection(Inline.MouseButton1Down, function()
+                ContentOutline.Visible = not ContentOutline.Visible
+                if ContentOutline.Visible then
+                    Icon.Text = "-"
+                    NewList.ZIndex = 5
+                else
+                    Icon.Text = "+"
+                    NewList.ZIndex = 1
+                end
+            end)
+            Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
+                if ContentOutline.Visible and Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    if not Library:IsMouseOverFrame(ContentOutline) and not Library:IsMouseOverFrame(Inline) then
+                        ContentOutline.Visible = false
+                        NewList.ZIndex = 1
+                        Icon.Text = "+"
+                    end
+                end
+            end)
+            --
+            local chosen = List.Max and {} or nil
+            local Count = 0
+            --
+            local function handleoptionclick(option, button, text)
+                button.MouseButton1Down:Connect(function()
+                    if List.Max then
+                        if table.find(chosen, option) then
+                            table.remove(chosen, table.find(chosen, option))
+        
+                            local textchosen = {}
+                            local cutobject = false
+        
+                            for _, opt in next, chosen do
+                                table.insert(textchosen, opt)
+                            end
+        
+                            Value.Text = #chosen == 0 and "None" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
+                            text.TextColor3 = Color3.fromRGB(145, 145, 145)
+                            
+                            Library.Flags[List.Flag] = chosen
+                            List.Callback(chosen)
+                        else
+                            if #chosen == List.Max then
+                                List.OptionInsts[chosen[1]].accent.Visible = false
+                                table.remove(chosen, 1)
+                            end
+        
+                            table.insert(chosen, option)
+        
+                            local textchosen = {}
+                            local cutobject = false
+        
+                            for _, opt in next, chosen do
+                                table.insert(textchosen, opt)
+                            end
+        
+                            Value.Text = #chosen == 0 and "None" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
+                            text.TextColor3 = Color3.fromRGB(255, 255, 255)
+                            Library.Flags[List.Flag] = chosen
+                            List.Callback(chosen)
+                        end
+                    else
+                        for opt, tbl in next, List.OptionInsts do
+                            if opt ~= option then
+                                tbl.text.TextColor3 = Color3.fromRGB(145, 145, 145)
+                            end
+                        end
+                        chosen = option
+                        Value.Text = option
+                        text.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        ContentOutline.Visible = false
+                        NewList.ZIndex = 1
+                        Icon.Text = "+"
+                        Library.Flags[List.Flag] = option
+                        List.Callback(option)
+                    end
+                end)
+            end
+            --
+            local function createoptions(tbl)
+                for _, option in next, tbl do
+                    List.OptionInsts[option] = {}
+                    --
+                    local NewOption = Instance.new("TextButton")
+                    NewOption.Name = "NewOption"
+                    NewOption.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
+                    NewOption.Text = ""
+                    NewOption.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    NewOption.TextSize = 12
+                    NewOption.TextStrokeTransparency = 0
+                    NewOption.TextWrapped = true
+                    NewOption.TextXAlignment = Enum.TextXAlignment.Left
+                    NewOption.AutoButtonColor = false
+                    NewOption.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    NewOption.BackgroundTransparency = 1
+                    NewOption.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                    NewOption.BorderSizePixel = 0
+                    NewOption.Size = UDim2.new(1, 0, 0, 14)
+        
+                    local OptionLabel = Instance.new("TextLabel")
+                    OptionLabel.Name = "OptionLabel"
+                    OptionLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+                    OptionLabel.Text = option
+                    OptionLabel.TextColor3 = Color3.fromRGB(145, 145, 145)
+                    OptionLabel.TextSize = 12
+                    OptionLabel.TextStrokeTransparency = 0
+                    OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
+                    OptionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    OptionLabel.BackgroundTransparency = 1
+                    OptionLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                    OptionLabel.BorderSizePixel = 0
+                    OptionLabel.Position = UDim2.new(0, 4, 0, 0)
+                    OptionLabel.Size = UDim2.new(1, 0, 1, 0)
+                    OptionLabel.Parent = NewOption
+        
+                    NewOption.Parent = ContentInline
+        
+                    List.OptionInsts[option].text = OptionLabel
+        
+                    Count = Count + 1
+        
+                    handleoptionclick(option, NewOption, OptionLabel)
+                end
+            end
+            createoptions(List.Options)
+            --
+            local set
+            set = function(option)
+                if List.Max then
+                    table.clear(chosen)
+                    option = type(option) == "table" and option or {}
+        
+                    for opt, tbl in next, List.OptionInsts do
+                        if not table.find(option, opt) then
+                            tbl.text.TextColor3 = Color3.fromRGB(145,145,145)
+                        end
+                    end
+        
+                    for i, opt in next, option do
+                        if table.find(List.Options, opt) and #chosen < List.Max then
+                            table.insert(chosen, opt)
+                            List.OptionInsts[opt].text.TextColor3 = Color3.fromRGB(255,255,255)
+                        end
+                    end
+        
+                    local textchosen = {}
+                    local cutobject = false
+        
+                    for _, opt in next, chosen do
+                        table.insert(textchosen, opt)
+                    end
+        
+                    Value.Text = #chosen == 0 and "None" or table.concat(textchosen, ",") .. (cutobject and ", ..." or "")
+        
+                    Library.Flags[List.Flag] = chosen
+                    List.Callback(chosen)
+                end
+            end
+            --
+            function List:Set(option)
+                if List.Max then
+                    set(option)
+                else
+                    for opt, tbl in next, List.OptionInsts do
+                        if opt ~= option then
+                            tbl.text.TextColor3 = Color3.fromRGB(145,145,145)
+                        end
+                    end
+                    if table.find(List.Options, option) then
+                        chosen = option
+                        List.OptionInsts[option].text.TextColor3 = Color3.fromRGB(255,255,255)
+                        Value.Text = option
+                        Library.Flags[List.Flag] = chosen
+                        List.Callback(chosen)
+                    else
+                        chosen = nil
+                        Value.Text = "None"
+                        Library.Flags[List.Flag] = chosen
+                        List.Callback(chosen)
+                    end
+                end
+            end
+            --
+            function List:Refresh(tbl)
+                for option, inst in next, List.OptionInsts do
+                    if inst.text and inst.text.Parent then
+                        inst.text.Parent:Destroy()
+                        print("Destroyed")
+                    end
+                end
+                table.clear(List.OptionInsts)
+        
+                createoptions(tbl)
+        
+                if List.Max then
+                    table.clear(chosen)
+                else
+                    chosen = nil
+                end
+        
+                Value.Text = "None"
+                Library.Flags[List.Flag] = chosen
+                List.Callback(chosen)
+            end
+        
+            -- // Returning
+            if List.Max then
+                Flags[List.Flag] = set
+            else
+                Flags[List.Flag] = List
+            end
+            List:Set(List.State)
+            return List
+        end
+        
+        
 		--
 		function Sections:ListBox(Properties)
 			local Properties = Properties or {};
@@ -2723,7 +2684,9 @@ do
 			function List:Refresh(tbl)
 				for _, opt in next, List.OptionInsts do
 					coroutine.wrap(function()
-						opt.button:Destroy()
+						if List.OptionInsts:FindFirstChild(opt) then
+							opt.button:Destroy()
+						end
 					end)()
 				end
 				table.clear(List.OptionInsts)
@@ -4308,5 +4271,3 @@ do
 		--
 	end;
 end;
-
-return Library
