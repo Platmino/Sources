@@ -4271,3 +4271,5 @@ do
 		--
 	end;
 end;
+
+return Library
