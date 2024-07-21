@@ -5,7 +5,7 @@ local Library = {};
 do
 	Library = {
 		Open = true;
-		Accent = Color3.fromRGB(255, 128, 139);
+		Accent = Color3.fromRGB(186, 181, 255);
 		PageAmount = 0;
 		Pages = {};
 		Sections = {};
@@ -255,6 +255,31 @@ do
 			end
 		end
 		--
+		function Library:Resize(object, background)
+			local start, objectposition, dragging, currentpos, currentsize
+
+			Library:Connection(object.MouseButton1Down, function(input)
+				dragging = true
+				start = input
+			end)
+			Library:Connection(Mouse.Move, function(input)
+				if dragging then
+					local MouseLocation = game:GetService("UserInputService"):GetMouseLocation()
+					local X = math.clamp(MouseLocation.X - background.AbsolutePosition.X, 550, 9999)
+					local Y = math.clamp((MouseLocation.Y - 36) - background.AbsolutePosition.Y, 600, 9999)
+					currentsize = UDim2.new(0,X,0,Y)
+					background.Size = currentsize
+					for Index, Page in pairs(Library.Pages) do
+						Page.Elements.Button.Size = UDim2.new(0, Library.PageAmount and ((((background.Size.X.Offset - 35) - ((Library.PageAmount - 1) * 2)) / Library.PageAmount)) - 3 or 65, 1, 0);
+					end
+				end;
+			end)
+			Library:Connection(game:GetService("UserInputService").InputEnded, function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+					dragging = false
+				end
+			end)
+		end
 	end;
 
 	-- // Colorpicker Element
@@ -702,7 +727,7 @@ do
 			AccentOutline.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			AccentOutline.ClipsDescendants = false
 			AccentOutline.Position = UDim2.new(0, 200, 0, 200)
-			AccentOutline.Size = UDim2.new(0, 550, 0, 400) -- was UDim2.new(0, 550, 0, 600)
+			AccentOutline.Size = UDim2.new(0, 550, 0, 725) -- was UDim2.new(0, 550, 0, 600)
 			AccentOutline.ZIndex = 2
 			AccentOutline.Text = ""
 			AccentOutline.AutoButtonColor = false
@@ -790,6 +815,22 @@ do
 			Title.Size = UDim2.new(0, 200, 0, 20)
 			Title.Parent = Inline
 			
+			local Resize = Instance.new("TextButton")
+			Resize.Name = "Resize"
+			Resize.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
+			Resize.Text = ""
+			Resize.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Resize.TextSize = 14
+			Resize.AutoButtonColor = false
+			Resize.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Resize.BackgroundTransparency = 1
+			Resize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Resize.BorderSizePixel = 0
+			Resize.Position = UDim2.new(1, -15, 1, -15)
+			Resize.Size = UDim2.new(0, 20, 0, 20)
+			Resize.Parent = Inline
+			Resize.ZIndex = 100
+			
 			local ImageLabel = Instance.new("ImageLabel")
 			ImageLabel.Name = "ImageLabel"
 			ImageLabel.Image = "rbxassetid://9052792535"
@@ -846,6 +887,7 @@ do
 					Library:SetOpen(not Library.Open)
 				end
 			end)
+			Library:Resize(Resize, AccentOutline)
 
 			-- // Functions
 			function Window:UpdateTabs()
@@ -2404,10 +2446,9 @@ do
 			function List:Refresh(tbl)
 				for _, opt in next, List.OptionInsts do
 					coroutine.wrap(function()
-					     opt.button:Destroy()
+						opt.button:Destroy()
 					end)()
 				end
-
 				table.clear(List.OptionInsts)
 
 				createoptions(tbl)
@@ -2682,7 +2723,7 @@ do
 			function List:Refresh(tbl)
 				for _, opt in next, List.OptionInsts do
 					coroutine.wrap(function()
-							opt.button:Destroy()
+						opt.button:Destroy()
 					end)()
 				end
 				table.clear(List.OptionInsts)
