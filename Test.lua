@@ -2404,9 +2404,7 @@ do
 			function List:Refresh(tbl)
 				for _, opt in next, List.OptionInsts do
 					coroutine.wrap(function()
-						pcall(function()
-							opt.button:Destroy()
-						end)
+					     opt.button:Destroy()
 					end)()
 				end
 
@@ -2684,9 +2682,7 @@ do
 			function List:Refresh(tbl)
 				for _, opt in next, List.OptionInsts do
 					coroutine.wrap(function()
-						pcall(function()
 							opt.button:Destroy()
-						end)
 					end)()
 				end
 				table.clear(List.OptionInsts)
