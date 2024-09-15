@@ -33,6 +33,7 @@ return {
 	17061444544, -- // Rae Hood
 	17344804827, -- // Yeno Hood
 	15644861772, -- // Flame Hood
+	18710690149, -- // Del Hood
     },
     ["MoonUpdateMousePos"] = {
         15166543806, -- // Moon Hood
