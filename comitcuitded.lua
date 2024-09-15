@@ -1,5 +1,5 @@
 return {
-    ["UpdateMousePosI"] = {
+    ["UpdateMousePosI2"] = {
         2788229376, -- // Da Hood
         7213786345, -- // Da Hood VC
         16033173781, -- // Da Hood Macro
@@ -33,7 +33,6 @@ return {
 	17061444544, -- // Rae Hood
 	17344804827, -- // Yeno Hood
 	15644861772, -- // Flame Hood
-	18710690149  --// Del Hood
     },
     ["MoonUpdateMousePos"] = {
         15166543806, -- // Moon Hood
