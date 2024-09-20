@@ -9,7 +9,7 @@ return {
         7951883376, -- // Hood Modded VC
     },
     ["MOUSE"] = {
-        17403265390, -- // Da Downhill
+        125825216602676, -- // Da Downhill
         15186202290, -- // Da Strike
 	18111448661, -- // Da Uphill
 	18111451594, -- // Da Bank
@@ -19,7 +19,7 @@ return {
 	17564716597, -- // Da Crossroads
     },
     ["UpdateMousePos"] = {
-        17319408836, -- // OGDH
+        17897702920, -- // OGDH
         11143225577, -- // 1v1 AimTrainer
 	17502123056, -- // AR hood
 	14174018683, -- // JS Hood
